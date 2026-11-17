@@ -2,7 +2,7 @@
   "name": "@tracklane/api",
   "version": "1.0.0",
   "description": "",
-  "scripts": { 
+  "scripts": {
     "dev": "tsx watch src/index.ts",
     "typecheck": "tsc -p tsconfig.json"
   },
@@ -13,6 +13,12 @@
   "type": "module",
   "dependencies": {
     "@tracklane/db": "workspace:*",
-    "@tracklane/shared": "workspace:*"
+    "@tracklane/shared": "workspace:*",
+    "fastify": "^5.12.8",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "pino-pretty": "^13.2.0",
+    "vitest": "^5.1.0"
   }
 }
