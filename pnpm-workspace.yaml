@@ -1,4 +1,4 @@
-# This file defines the workspace root and which directories belong to it; without a packages list, only the root package is included. 
+# This file defines the workspace root and which directories belong to it; without a packages list, only the root package is included.
 packages:
   - "apps/*"
   - "packages/*"

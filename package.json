@@ -4,7 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "",
@@ -20,6 +22,7 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "prettier": "3.10.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }
