@@ -40,7 +40,7 @@ export function buildApp(config: Config) {
     if (error.statusCode && error.statusCode >= 400 && error.statusCode < 500) {
       return reply
         .code(error.statusCode)
-        .send({ error: { code: error.code ?? "BAD_REQUEST", message: error.message } });
+        .send({ error: { code: "BAD_REQUEST", message: error.message } });
     }
 
     request.log.error({ err: error }, "unhandled error");
