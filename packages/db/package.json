@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "db:migrate": "tsx --env-file=../../.env src/migrate.ts"
   },
   "exports": {
     ".": "./src/index.ts"
@@ -12,5 +13,12 @@
   "author": "",
   "license": "ISC",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "kysely": "^0.29.9",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
+  }
 }

@@ -2,8 +2,15 @@ import Fastify, { type FastifyError } from "fastify";
 import type { Config } from "./config";
 import { HttpError } from "./lib/errors";
 import { healthRoutes } from "./routes/health";
+import type { Database } from "@tracklane/db";
 
-export function buildApp(config: Config) {
+declare module "fastify" {
+  interface FastifyInstance {
+    db: Database;
+  }
+}
+
+export function buildApp(config: Config, { db }: { db: Database }) {
   const app = Fastify({
     logger:
       config.NODE_ENV === "development"
@@ -15,6 +22,12 @@ export function buildApp(config: Config) {
             },
           }
         : { level: config.LOG_LEVEL },
+  });
+
+  app.decorate("db", db);
+
+  app.addHook("onClose", async () => {
+    await db.destroy();
   });
 
   app.setErrorHandler((error: FastifyError, request, reply) => {

@@ -1,21 +1,31 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { createDb } from "@tracklane/db";
 import { buildApp } from "../src/app";
 import type { Config } from "../src/config";
 import { badRequest } from "../src/lib/errors";
+
+// Fail loudly instead of letting pg fall back to its defaults (localhost:5432).
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL is not set; tests load it from the root .env");
+}
 
 const testConfig: Config = {
   NODE_ENV: "test",
   PORT: 3000,
   LOG_LEVEL: "silent",
-  DATABASE_URL: "postgresql://test:test@localhost:5433/test",
+  DATABASE_URL: databaseUrl,
   REDIS_URL: "redis://localhost:6380",
 };
+
+// Nothing listens on port 1, so connecting fails immediately.
+const UNREACHABLE_DB_URL = "postgresql://x:x@127.0.0.1:1/x";
 
 describe("api app", () => {
   let app: ReturnType<typeof buildApp>;
 
   beforeEach(() => {
-    app = buildApp(testConfig);
+    app = buildApp(testConfig, { db: createDb(testConfig.DATABASE_URL) });
   });
 
   afterEach(async () => {
@@ -78,5 +88,25 @@ describe("api app", () => {
         message: "Body is not valid JSON but content-type is set to 'application/json'",
       },
     });
+  });
+
+  it("GET /ready returns 200 when the database is reachable", async () => {
+    const res = await app.inject({ method: "GET", url: "/ready" });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({ status: "ready", database: "up" });
+  });
+
+  it("GET /ready returns 503 when the database is unreachable", async () => {
+    const downApp = buildApp(testConfig, { db: createDb(UNREACHABLE_DB_URL) });
+
+    try {
+      const res = await downApp.inject({ method: "GET", url: "/ready" });
+
+      expect(res.statusCode).toBe(503);
+      expect(res.json()).toEqual({ status: "not_ready", database: "down" });
+    } finally {
+      await downApp.close();
+    }
   });
 });

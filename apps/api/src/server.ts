@@ -1,10 +1,12 @@
 import { config } from "./config";
 import { buildApp } from "./app";
+import { createDb, type Database } from "@tracklane/db";
 
 // Wait for In-flight requests
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 
-const app = buildApp(config);
+const db = createDb(config.DATABASE_URL);
+const app = buildApp(config, { db });
 
 try {
   await app.listen({ port: config.PORT, host: "0.0.0.0" });
