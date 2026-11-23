@@ -25,15 +25,26 @@ async function runMigrations() {
     const { error, results } = await migrator.migrateToLatest();
 
     results?.forEach((it) => {
-      if (it.status === "Success") {
-        console.log(`migration "${it.migrationName}" was executed successfully`);
-      } else if (it.status === "Error") {
-        console.error(`failed to execute migration "${it.migrationName}"`);
+      switch (it.status) {
+        case "Success":
+          console.log(`migration "${it.migrationName}" was executed successfully`);
+          break;
+        case "Error":
+          console.error(`failed to execute migration "${it.migrationName}"`);
+          break;
+        case "NotExecuted":
+          console.error(`skipped migration "${it.migrationName}"`);
+          break;
+        default: {
+          const unhandled: never = it.status;
+          throw new Error(`unknown migration status: ${unhandled}`);
+        }
       }
     });
 
     if (error) {
       console.error("migration failed:", error);
+      console.error("the whole batch was rolled back; no migration in this run was applied");
       process.exitCode = 1;
     } else if (!results?.length) {
       console.log("no pending migrations");

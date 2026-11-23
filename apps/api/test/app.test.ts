@@ -93,7 +93,10 @@ describe("api app", () => {
   it("GET /ready returns 200 when the database is reachable", async () => {
     const res = await app.inject({ method: "GET", url: "/ready" });
 
-    expect(res.statusCode).toBe(200);
+    expect(
+      res.statusCode,
+      "Postgres unreachable: is Docker running? (docker compose start db)",
+    ).toBe(200);
     expect(res.json()).toEqual({ status: "ready", database: "up" });
   });
 
